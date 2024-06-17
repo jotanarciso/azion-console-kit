@@ -70,11 +70,20 @@ Azion Console Kit can run natively on Azion's edge using Azion CLI. Follow these
     ```bash
     azion -t ${PERSONAL_TOKEN}
     ```
-2. Publish your project:
+
+2. Link project to an Azion edge application.
+
+     ```bash
+    azion link
+    ```
+
+3. Publish your project:
 
     ```bash
     azion deploy
     ```
+
+    One of the rules used in `azion.config.cjs` _(to rewrite the authentication cookie using your domain)_ needs the created domain to work. So, **after the first deploy**, just run the `Azion deploy` command again and everything should work 🚀
 
 After a few seconds, access your project on the domain provided by the CLI.
 
