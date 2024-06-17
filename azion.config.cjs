@@ -1,8 +1,11 @@
-const myDomain = 'r07lmvf3aa.map.azionedge.net'
+
+/* eslint-env node */
+const config = require('./azion/azion.json');
+const myDomain = config.domain.domain_name;
 
 const commonRules = [
   {
-    name: 'Common configuration',
+    name: 'Apply Common Configuration for All Requests',
     match: '^\\/',
     behavior: {
       setHeaders: ['Accept: application/json; version=3;'],
@@ -16,6 +19,7 @@ const commonRules = [
 const frontRules = [
   {
     name: 'Set Storage Origin for All Requests',
+    description: 'Applies common settings for all requests, including standard headers, cache bypass, cookie forwarding, and HTTP to HTTPS redirection.',
     match: '^\\/',
     behavior: {
       setOrigin: {
@@ -25,7 +29,8 @@ const frontRules = [
     }
   },
   {
-    name: 'Deliver Static Assets',
+    name: 'Deliver Static Assets from Storage',
+    description: 'Sets the storage origin and deliver for all requests using the default object storage.',
     match: '.(css|js|ttf|woff|woff2|pdf|svg|jpg|jpeg|gif|bmp|png|ico|mp4|json|xml|html)$',
     behavior: {
       setOrigin: {
@@ -36,7 +41,8 @@ const frontRules = [
     }
   },
   {
-    name: 'Redirect to index.html',
+    name: 'Redirect All Non-Asset Requests to to index.html',
+    description: 'Delivers static assets such as CSS, JS, images, and other files directly from object storage.',
     match: '^\\/',
     behavior: {
       rewrite: {
@@ -48,7 +54,8 @@ const frontRules = [
 
 const backRules = [
   {
-    name: 'API_Default',
+    name: 'Route API Default Requests to API Origin',
+    description: 'Routes all default API requests to the specific API origin.',
     match: '^/api',
     behavior: {
       setOrigin: {
@@ -58,7 +65,8 @@ const backRules = [
     }
   },
   {
-    name: 'API_Marketplace_ScriptRunner_TemplateEngine',
+    name: 'Route Specific API Services to Script Runner Origin',
+    description: 'Routes specific API services such as marketplace, script-runner, and template-engine to the script runner origin.',
     match: '^/api/(marketplace|script-runner|template-engine)',
     behavior: {
       setOrigin: {
@@ -68,7 +76,8 @@ const backRules = [
     }
   },
   {
-    name: 'API_VCS',
+    name: 'Route Version Control System API to VCS Origin',
+    description: 'Routes version control system API requests to the VCS origin.',
     match: '^/api/vcs',
     behavior: {
       setOrigin: {
@@ -78,7 +87,8 @@ const backRules = [
     }
   },
   {
-    name: 'GraphQL_Cities',
+    name: 'Route GraphQL City Queries to Cities Origin',
+    description: 'Routes GraphQL queries for cities to the specific cities origin.',
     match: '^/graphql/cities',
     behavior: {
       setOrigin: {
@@ -88,7 +98,8 @@ const backRules = [
     }
   },
   {
-    name: 'API_Account_User_Token_Auth',
+    name: 'Route User Authentication and Account Management to SSO Origin',
+    description: 'Routes user authentication and account management requests to the SSO origin, with cookie forwarding and cache bypass.',
     match: '^/api/(account|user|token|switch-account|auth|password|totp)|^/logout',
     behavior: {
       setOrigin: {
@@ -162,6 +173,7 @@ const AzionConfig = {
       {
     
         name: 'Rewrite _azrt Cookie',
+        description: 'Captures and rewrites the _azrt cookie from upstream responses, setting it with specific domain, path, and security settings.',
         match: '.*',
         variable: 'upstream_cookie__azrt',
         behavior: {
@@ -176,6 +188,7 @@ const AzionConfig = {
       },
       {
         name: 'Rewrite azsid Cookie',
+        description: 'Captures and rewrites the azsid cookie from upstream responses, applying new domain, expiration, and secure attributes.',
         match: '.*',
         variable: 'upstream_cookie_azsid',
         behavior: {
@@ -190,6 +203,7 @@ const AzionConfig = {
       },
       {
         name: 'Rewrite _azat Cookie',
+        description: 'Captures and rewrites the _azat cookie from upstream responses, setting secure, domain-specific settings for enhanced security.',
         match: '.*',
         variable: 'upstream_cookie__azat',
         behavior: {
@@ -204,6 +218,7 @@ const AzionConfig = {
       },
       {
         name: 'Secure Headers',
+        description: 'Sets various security headers to enhance the security posture of responses, including protections against clickjacking, XSS, and other web vulnerabilities.',
         match: '^\\/',
         behavior: {
           setHeaders: [
@@ -218,6 +233,7 @@ const AzionConfig = {
       }
       // {
       //   name: 'CSP Header - Content Secure Policy',
+      //  description: 'Sets a comprehensive Content Security Policy (CSP) header to enhance security by defining a whitelist of sources from which various types of resources can be loaded. This policy helps mitigate various types of attacks including Cross-Site Scripting (XSS) and data injection.',
       //   match: '^\\/',
       //   behavior: {
       //     setHeaders: [
@@ -229,4 +245,4 @@ const AzionConfig = {
   }
 }
 
-export default AzionConfig
+module.exports = AzionConfig
