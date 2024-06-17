@@ -1,7 +1,7 @@
 
 /* eslint-env node */
 const config = require('./azion/azion.json');
-const myDomain = config.domain.domain_name;
+const myDomain = config.domain.domain_name ?? 'console.azion.com'
 
 const commonRules = [
   {
