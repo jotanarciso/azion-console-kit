@@ -6,6 +6,7 @@ const myDomain = config.domain.domain_name;
 const commonRules = [
   {
     name: 'Apply Common Configuration for All Requests',
+    description: 'Applies common settings for all requests, including standard headers and HTTP to HTTPS redirection.',
     match: '^\\/',
     behavior: {
       setHeaders: ['Accept: application/json; version=3;'],
@@ -19,7 +20,7 @@ const commonRules = [
 const frontRules = [
   {
     name: 'Set Storage Origin for All Requests',
-    description: 'Applies common settings for all requests, including standard headers, cache bypass, cookie forwarding, and HTTP to HTTPS redirection.',
+    description: 'Sets the default object storage as the origin for all requests.',
     match: '^\\/',
     behavior: {
       setOrigin: {
@@ -65,14 +66,57 @@ const backRules = [
     }
   },
   {
+    name: 'Route Specific API Services to Marketplace Origin',
+    description: 'Routes marketplace API services to the manager origin, forwarding cookies and bypassing cache.',
+    match: '^/api/marketplace',
+    behavior: {
+      setOrigin: {
+        name: 'origin-manager',
+        type: 'single_origin'
+      },
+      forwardCookies: true,
+      rewrite: {
+        match: '/api/marketplace/(.*)',
+        subject: 'request_uri',
+        set: (captured) => `/marketplace/api/${captured[1]}`
+      },
+      bypassCache: true,
+    }
+  },
+  {
+    name: 'Route Specific API Services to Template Engine Origin',
+    description: 'Routes template-engine API services to the manager origin, forwarding cookies and bypassing cache.',
+    match: '^/api/template-engine',
+    behavior: {
+      setOrigin: {
+        name: 'origin-manager',
+        type: 'single_origin'
+      },
+      forwardCookies: true,
+      rewrite: {
+        match: '/api/template-engine/(.*)',
+        subject: 'request_uri',
+        set: (captured) => `/template-engine/api/${captured[1]}`
+      },
+      bypassCache: true,
+    }
+  },
+  {
     name: 'Route Specific API Services to Script Runner Origin',
-    description: 'Routes specific API services such as marketplace, script-runner, and template-engine to the script runner origin.',
-    match: '^/api/(marketplace|script-runner|template-engine)',
+    description: 'Routes script-runner API services to the script runner origin, forwarding cookies and bypassing cache.',
+    match: '^/api/script-runner',
     behavior: {
       setOrigin: {
         name: 'origin-script-runner',
         type: 'single_origin'
-      }
+      },
+      forwardCookies: true,
+      rewrite: {
+        match: '/api/script-runner/(.*)',
+        subject: 'request_uri',
+        set: (captured) => `/script-runner/api/${captured[1]}`
+      },
+      bypassCache: true,
     }
   },
   {
@@ -107,7 +151,7 @@ const backRules = [
         type: 'single_origin'
       },
       forwardCookies: true,
-      bypassCache: true
+      bypassCache: true,
     }
   }
 ]
@@ -118,12 +162,12 @@ const AzionConfig = {
       name: 'origin-storage-default',
       type: 'object_storage'
     },
-    // {
-    //   name: 'origin-manager',
-    //   type: 'single_origin',
-    //   hostHeader: `manager.azion.com`,
-    //   addresses: [`manager.azion.com`]
-    // },
+    {
+      name: 'origin-manager',
+      type: 'single_origin',
+      hostHeader: `manager-origin.azion.com`,
+      addresses: [`manager-origin.azion.com`]
+    },
     {
       name: 'origin-vcs',
       type: 'single_origin',
