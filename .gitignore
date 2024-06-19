@@ -36,7 +36,6 @@ cypress.env.*
 !cypress.env.example.json
 
 #azion vulcan folder
-azion
 .edge
-
+# azion
 src/views/Playground/PlaygroundView.vue

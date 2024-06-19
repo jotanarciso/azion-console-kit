@@ -1,6 +1,7 @@
 
 /* eslint-env node */
-const config = require('./azion/azion.json');
+const environment = process.env.VITE_ENVIRONMENT || 'production';
+const config = require(`./azion/${environment}/azion.json`);
 const myDomain = config.domain.domain_name ?? 'console.azion.com'
 
 const commonRules = [

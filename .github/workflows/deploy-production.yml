@@ -31,6 +31,7 @@ jobs:
         run: azion -t ${{ secrets.PLATFORM_KIT_TOKEN }}
 
       - name: Build & Deploy
-        run: azion deploy --auto
+        run: azion deploy --auto --config-dir azion/production
         env:
           VITE_RECAPTCHA_SITE_KEY: ${{ secrets.PROD_RECAPTCHA_SITE_KEY }}
+          NODE_ENV: production
